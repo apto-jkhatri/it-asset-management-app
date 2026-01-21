@@ -1,0 +1,33 @@
+import { Asset, Employee, AssetStatus, AssetCondition, Assignment, MaintenanceLog, AssetRequest } from '../types';
+
+export const INITIAL_EMPLOYEES: Employee[] = [
+  { id: 'E001', name: 'Alice Johnson', email: 'alice@company.com', department: 'Engineering', role: 'Frontend Dev', joinDate: '2023-01-15', avatar: 'https://picsum.photos/seed/alice/200' },
+  { id: 'E002', name: 'Bob Smith', email: 'bob@company.com', department: 'Engineering', role: 'Backend Dev', joinDate: '2022-11-01', avatar: 'https://picsum.photos/seed/bob/200' },
+  { id: 'E003', name: 'Charlie Brown', email: 'charlie@company.com', department: 'Design', role: 'UI/UX Designer', joinDate: '2023-03-10', avatar: 'https://picsum.photos/seed/charlie/200' },
+  { id: 'E004', name: 'Diana Prince', email: 'diana@company.com', department: 'Product', role: 'Product Manager', joinDate: '2021-06-20', avatar: 'https://picsum.photos/seed/diana/200' },
+  { id: 'E005', name: 'Ethan Hunt', email: 'ethan@company.com', department: 'Sales', role: 'Sales Lead', joinDate: '2020-09-05', avatar: 'https://picsum.photos/seed/ethan/200' },
+];
+
+export const INITIAL_ASSETS: Asset[] = [
+  { id: 'A001', tag: 'AST-1001', name: 'MacBook Pro M2', serialNumber: 'C02XXXXX1', category: 'Laptop', vendor: 'Apple', purchaseDate: '2023-01-01', cost: 2499, status: AssetStatus.ASSIGNED, condition: AssetCondition.GOOD, location: 'Remote', assignedTo: 'E001', image: 'https://picsum.photos/seed/mac1/300/200' },
+  { id: 'A002', tag: 'AST-1002', name: 'Dell XPS 15', serialNumber: 'DL-55214', category: 'Laptop', vendor: 'Dell', purchaseDate: '2022-12-15', cost: 1899, status: AssetStatus.ASSIGNED, condition: AssetCondition.GOOD, location: 'Office', assignedTo: 'E002', image: 'https://picsum.photos/seed/dell1/300/200' },
+  { id: 'A003', tag: 'AST-1003', name: 'LG UltraFine 5K', serialNumber: 'LG-998877', category: 'Peripheral', vendor: 'LG', purchaseDate: '2023-02-01', cost: 1299, status: AssetStatus.AVAILABLE, condition: AssetCondition.NEW, location: 'IT Storage' },
+  { id: 'A004', tag: 'AST-1004', name: 'Keychron K2', serialNumber: 'KC-112233', category: 'Keyboard', vendor: 'Keychron', purchaseDate: '2023-05-10', cost: 99, status: AssetStatus.IN_REPAIR, condition: AssetCondition.FAIR, location: 'Repair Shop' },
+  { id: 'A005', tag: 'AST-1005', name: 'Herman Miller Chair', serialNumber: 'HM-AER-01', category: 'Furniture', vendor: 'Herman Miller', purchaseDate: '2021-08-01', cost: 1400, status: AssetStatus.ASSIGNED, condition: AssetCondition.GOOD, location: 'Office', assignedTo: 'E004' },
+  { id: 'A006', tag: 'AST-1006', name: 'iPad Pro 12.9', serialNumber: 'AP-IPAD-X', category: 'Tablet', vendor: 'Apple', purchaseDate: '2023-11-01', cost: 1099, status: AssetStatus.AVAILABLE, condition: AssetCondition.NEW, location: 'IT Storage' },
+  { id: 'A007', tag: 'AST-1007', name: 'ThinkPad X1 Carbon', serialNumber: 'TP-X1-99', category: 'Laptop', vendor: 'Lenovo', purchaseDate: '2020-03-15', cost: 1600, status: AssetStatus.RETIRED, condition: AssetCondition.POOR, location: 'Recycling Bin' },
+];
+
+export const INITIAL_ASSIGNMENTS: Assignment[] = [
+  { id: 'ASG-001', assetId: 'A001', employeeId: 'E001', borrowDate: '2023-01-20', isActive: true },
+  { id: 'ASG-002', assetId: 'A002', employeeId: 'E002', borrowDate: '2023-02-10', isActive: true },
+  { id: 'ASG-003', assetId: 'A005', employeeId: 'E004', borrowDate: '2021-08-05', isActive: true },
+];
+
+export const INITIAL_MAINTENANCE: MaintenanceLog[] = [
+  { id: 'M-001', assetId: 'A004', description: 'Key switch replacement (Enter key stuck)', vendor: 'KeyFix Inc.', cost: 45, date: '2023-10-25', status: 'In Progress' },
+];
+
+export const INITIAL_REQUESTS: AssetRequest[] = [
+  { id: 'R-001', employeeId: 'E003', category: 'Hardware Issue', reason: 'Need second screen for design work', status: 'Pending', requestDate: '2023-10-26' },
+];
