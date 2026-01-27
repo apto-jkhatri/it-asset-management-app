@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useApp } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { AssetStatus } from '../types';
-import { Box, Wrench, Users, FilterX } from 'lucide-react';
+import { AssetStatus, Asset } from '../types';
+import { Box, Wrench, Users, FilterX, Laptop, ArrowRight } from 'lucide-react';
 
 const StatCard = ({ title, value, icon: Icon, color }: any) => (
   <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
@@ -20,60 +20,45 @@ const StatCard = ({ title, value, icon: Icon, color }: any) => (
 );
 
 const Dashboard = () => {
-  const { assets, maintenanceLogs } = useApp();
+  const { assets, employees, maintenanceLogs } = useApp();
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedFilter, setSelectedFilter] = React.useState<{ category: string, status: string } | null>(null);
 
-  // Global Stats (Unaffected by filter)
-  const totalAssets = assets.length;
-  const globalAssigned = assets.filter(a => a.status === AssetStatus.ASSIGNED).length;
-  const globalInRepair = assets.filter(a => a.status === AssetStatus.IN_REPAIR).length;
+  // Global Stats - Inventory focused
+  const availableAssetsCount = assets.filter(a => a.status === AssetStatus.AVAILABLE).length;
+  const inRepairCount = assets.filter(a => a.status === AssetStatus.IN_REPAIR).length;
+  const assignedAssetsCount = assets.filter(a => a.status === AssetStatus.ASSIGNED).length;
 
-  // Filtered Data for Pie Chart
-  const filteredAssets = selectedCategory
-    ? assets.filter(a => a.category === selectedCategory)
-    : assets;
+  // Aggregate assets by category and status
+  const categoryStatusData = Object.values(assets.reduce((acc: any, asset) => {
+    if (!acc[asset.category]) {
+      acc[asset.category] = {
+        name: asset.category,
+        Available: 0,
+        Assigned: 0,
+        'In Repair': 0
+      };
+    }
+    const status = asset.status;
+    if (status === AssetStatus.AVAILABLE) acc[asset.category].Available++;
+    else if (status === AssetStatus.ASSIGNED) acc[asset.category].Assigned++;
+    else if (status === AssetStatus.IN_REPAIR) acc[asset.category]['In Repair']++;
 
-  const assignedAssetsPie = filteredAssets.filter(a => a.status === AssetStatus.ASSIGNED).length;
-  const availableAssetsPie = filteredAssets.filter(a => a.status === AssetStatus.AVAILABLE).length;
-  const inRepairPie = filteredAssets.filter(a => a.status === AssetStatus.IN_REPAIR).length;
-
-  // Pie Chart Data
-  const statusData = [
-    { name: 'Assigned', value: assignedAssetsPie, color: '#3b82f6' },
-    { name: 'Available', value: availableAssetsPie, color: '#10b981' },
-    { name: 'Repair', value: inRepairPie, color: '#f59e0b' },
-    { name: 'Others', value: filteredAssets.length - assignedAssetsPie - availableAssetsPie - inRepairPie, color: '#64748b' },
-  ].filter(item => item.value > 0); // Filter out zero values to avoid ugly pie slices
-
-  // Aggregate assets by category (Always shows all categories)
-  const categoryData = Object.values(assets.reduce((acc: any, asset) => {
-    acc[asset.category] = acc[asset.category] || { name: asset.category, count: 0 };
-    acc[asset.category].count++;
     return acc;
   }, {}));
 
-  const handleBarClick = (data: any) => {
-    if (data && data.name) {
-      setSelectedCategory(prev => prev === data.name ? null : data.name);
-    }
-  };
-
-  const handleGenerateReport = () => {
+  const handleExportInventory = () => {
     if (assets.length === 0) {
       alert("No assets to export.");
       return;
     }
 
-    // Define headers
     const headers = ["ID", "Tag", "Name", "Category", "Status", "Assigned To", "Location", "Purchase Date", "Cost"];
-
-    // Map data
     const csvContent = [
       headers.join(","),
       ...assets.map(a => [
         a.id,
-        `"${a.tag}"`, // Quote strings that might contain commas
+        `"${a.tag}"`,
         `"${a.name}"`,
         `"${a.category}"`,
         a.status,
@@ -84,172 +69,238 @@ const Dashboard = () => {
       ].join(","))
     ].join("\n");
 
-    // Create download link
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `asset_report_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute("download", `inventory_report_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  const handleExportEmployeeAssignments = () => {
+    const assignedAssets = assets.filter(a => a.status === AssetStatus.ASSIGNED && a.assignedTo);
+
+    if (assignedAssets.length === 0) {
+      alert("No active assignments to export.");
+      return;
+    }
+
+    const headers = ["Employee Name", "Asset Category", "Asset Name", "Asset Tag", "Serial Number", "Location"];
+
+    const csvContent = [
+      headers.join(","),
+      ...assignedAssets.map(a => {
+        const employee = employees.find(e => e.id === a.assignedTo);
+        return [
+          `"${employee?.name || 'Unknown'}"`,
+          `"${a.category}"`,
+          `"${a.name}"`,
+          `"${a.tag}"`,
+          `"${a.serialNumber}"`,
+          `"${a.location}"`
+        ].join(",");
+      })
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `employee_assignments_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleBarClick = (data: any, statusType: string) => {
+    if (data && data.name) {
+      if (selectedFilter?.category === data.name && selectedFilter?.status === statusType) {
+        setSelectedFilter(null);
+      } else {
+        setSelectedFilter({ category: data.name, status: statusType });
+      }
+    }
+  };
+
+  const filteredAssetsList = selectedFilter
+    ? assets.filter(a => a.category === selectedFilter.category && a.status === selectedFilter.status)
+    : [];
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Dashboard Overview</h1>
-          <p className="text-slate-500">Welcome back, here's what's happening with your assets today.</p>
+          <h1 className="text-2xl font-bold text-slate-900">Inventory Dashboard</h1>
+          <p className="text-slate-500">Real-time overview of your asset availability and health.</p>
         </div>
-        <div className="mt-4 md:mt-0">
+        <div className="flex flex-wrap items-center gap-3">
           <button
-            onClick={handleGenerateReport}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+            onClick={handleExportInventory}
+            className="flex items-center gap-2 bg-white text-slate-700 px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all border border-slate-200 shadow-sm active:scale-95 text-sm font-medium"
           >
-            Generate Report
+            Export All Inventory
+          </button>
+          <button
+            onClick={handleExportEmployeeAssignments}
+            className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95 text-sm font-medium"
+          >
+            Export Employee Assignments
           </button>
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Inventory KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Total Assets" value={totalAssets} icon={Box} color="bg-blue-500" />
-        <StatCard title="Assigned Assets" value={globalAssigned} icon={Users} color="bg-indigo-500" />
-        <StatCard title="In Repair" value={globalInRepair} icon={Wrench} color="bg-amber-500" />
+        <StatCard title="Ready for Issue" value={availableAssetsCount} icon={Box} color="bg-emerald-500 shadow-emerald-200" />
+        <StatCard title="Out for Repair" value={inRepairCount} icon={Wrench} color="bg-amber-500 shadow-amber-200" />
+        <StatCard title="Currently Assigned" value={assignedAssetsCount} icon={Users} color="bg-blue-500 shadow-blue-200" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Pie Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-slate-900">
-              Asset Status {selectedCategory ? <span className="text-blue-600">({selectedCategory})</span> : 'Distribution'}
-            </h3>
-            {selectedCategory && (
-              <button
-                onClick={() => setSelectedCategory(null)}
-                className="text-xs flex items-center gap-1 text-slate-500 hover:text-slate-800 bg-slate-100 px-2.5 py-1.5 rounded-full transition-colors border border-slate-200"
-              >
-                <FilterX size={12} /> Clear Filter
-              </button>
-            )}
+      <div className="grid grid-cols-1 gap-6">
+        {/* Inventory Distribution Stacked Bar Chart */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[500px]">
+          <div className="mb-8">
+            <h3 className="text-lg font-bold text-slate-900">Inventory Status by Category</h3>
+            <p className="text-sm text-slate-500">Monitoring stock availability to prevent last-minute shortfalls.</p>
           </div>
           <div className="flex-1 w-full min-h-0">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={5}
-                  dataKey="value"
-                  label
-                >
-                  {statusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                />
-                <Legend verticalAlign="bottom" height={36} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Bar Chart */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-slate-900">Assets by Category</h3>
-            <p className="text-xs text-slate-400 mt-1">Click a bar to filter the status chart</p>
-          </div>
-          <div className="flex-1 w-full min-h-0">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categoryData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+              <BarChart data={categoryStatusData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }} barGap={0} barCategoryGap="25%">
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tick={{ fontSize: 13, fontWeight: 500, fill: '#64748b' }}
                   axisLine={false}
                   tickLine={false}
+                  dy={10}
                 />
                 <YAxis
-                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tick={{ fontSize: 13, fill: '#94a3b8' }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip
                   cursor={{ fill: '#f8fafc' }}
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  itemStyle={{ fontSize: '12px', fontWeight: 600 }}
                 />
-                <Bar dataKey="count" radius={[4, 4, 0, 0]} onClick={handleBarClick}>
-                  {categoryData.map((entry: any, index: number) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={selectedCategory === entry.name ? '#2563eb' : (selectedCategory ? '#cbd5e1' : '#3b82f6')}
-                      cursor="pointer"
-                    />
-                  ))}
-                </Bar>
+                <Legend
+                  verticalAlign="top"
+                  align="right"
+                  iconType="circle"
+                  wrapperStyle={{ paddingBottom: '30px', fontSize: '13px', fontWeight: 500 }}
+                />
+                <Bar
+                  dataKey="Available"
+                  fill="#10b981"
+                  radius={[4, 4, 0, 0]}
+                  stackId="a"
+                  onClick={(data) => handleBarClick(data, AssetStatus.AVAILABLE)}
+                  cursor="pointer"
+                />
+                <Bar
+                  dataKey="Assigned"
+                  fill="#3b82f6"
+                  radius={[0, 0, 0, 0]}
+                  stackId="a"
+                  onClick={(data) => handleBarClick(data, AssetStatus.ASSIGNED)}
+                  cursor="pointer"
+                />
+                <Bar
+                  dataKey="In Repair"
+                  fill="#f59e0b"
+                  radius={[0, 0, 0, 0]}
+                  stackId="a"
+                  onClick={(data) => handleBarClick(data, AssetStatus.IN_REPAIR)}
+                  cursor="pointer"
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
 
-      {/* Recent Activity / Maintenance */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-slate-900">Recent Maintenance Logs</h3>
-          <button onClick={() => navigate('/maintenance')} className="text-blue-600 text-sm hover:underline cursor-pointer">View All</button>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-slate-50 text-slate-500 font-medium">
-              <tr>
-                <th className="px-6 py-3">Asset</th>
-                <th className="px-6 py-3">Description</th>
-                <th className="px-6 py-3">Vendor</th>
-                <th className="px-6 py-3">Date</th>
-                <th className="px-6 py-3">Cost</th>
-                <th className="px-6 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {maintenanceLogs.map((log) => {
-                const asset = assets.find(a => a.id === log.assetId);
-                return (
-                  <tr key={log.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 font-medium text-slate-900">{asset?.name || 'Unknown'}</td>
-                    <td className="px-6 py-4 text-slate-600">{log.description}</td>
-                    <td className="px-6 py-4 text-slate-600">{log.vendor}</td>
-                    <td className="px-6 py-4 text-slate-600">{log.date}</td>
-                    <td className="px-6 py-4 text-slate-600">${log.cost}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${log.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                        }`}>
-                        {log.status}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-              {maintenanceLogs.length === 0 && (
+
+      {/* Selected Assets Detail Table */}
+      {selectedFilter && (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-slate-900">
+                  {selectedFilter.status} {selectedFilter.category}s
+                </h3>
+                <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">
+                  {filteredAssetsList.length} Found
+                </span>
+              </div>
+              <p className="text-sm text-slate-500 mt-1">Showing detailed list for selected category and status.</p>
+            </div>
+            <button
+              onClick={() => setSelectedFilter(null)}
+              className="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-200 rounded-lg transition-colors"
+            >
+              <FilterX size={20} />
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-slate-50 text-slate-500 font-medium">
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
-                    No recent maintenance logs found.
-                  </td>
+                  <th className="px-6 py-4">Asset Name</th>
+                  <th className="px-6 py-4">Tag</th>
+                  <th className="px-6 py-4">Current Owner</th>
+                  <th className="px-6 py-4">Location</th>
+                  <th className="px-6 py-4 text-right">Action</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredAssetsList.map((asset: Asset) => {
+                  const owner = employees.find(e => e.id === asset.assignedTo);
+                  return (
+                    <tr key={asset.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-slate-100 rounded-lg text-slate-500">
+                            <Laptop size={16} />
+                          </div>
+                          <span className="font-semibold text-slate-900">{asset.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <code className="bg-slate-100 px-2 py-1 rounded text-xs font-mono text-slate-600">{asset.tag}</code>
+                      </td>
+                      <td className="px-6 py-4">
+                        {owner ? (
+                          <div className="flex items-center gap-2">
+                            <img src={owner.avatar} alt="" className="w-6 h-6 rounded-full" />
+                            <span className="text-slate-700">{owner.name}</span>
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 italic">Unassigned</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-slate-600">{asset.location}</td>
+                      <td className="px-6 py-4 text-right">
+                        <button
+                          onClick={() => navigate('/assets')}
+                          className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1 group"
+                        >
+                          Details <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

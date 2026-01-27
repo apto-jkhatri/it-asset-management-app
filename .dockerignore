@@ -1,0 +1,7 @@
+node_modules
+mysql_data
+mysql_recovery_backup
+dist
+dist-electron
+.git
+.vscode

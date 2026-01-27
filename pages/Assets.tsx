@@ -29,6 +29,7 @@ const Assets = () => {
   const [viewingHistoryAsset, setViewingHistoryAsset] = useState<Asset | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Form State
   const [selectedCategory, setSelectedCategory] = useState('Laptop');
@@ -119,6 +120,7 @@ const Assets = () => {
     setSelectedCategory('Laptop');
     setCustomCategory('');
     setQuantity(1);
+    setError(null);
     setIsModalOpen(true);
   };
 
@@ -127,6 +129,7 @@ const Assets = () => {
     setSelectedCategory(asset.category);
     setCustomCategory('');
     setQuantity(1);
+    setError(null);
     setIsModalOpen(true);
   };
 
@@ -145,8 +148,23 @@ const Assets = () => {
 
   const handleSaveSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
+
+    const baseTag = (formData.get('tag') as string).trim();
+    if (!baseTag) return;
+
+    // Check for duplicate tag
+    const isDuplicate = assets.some(a =>
+      a.tag.toLowerCase() === baseTag.toLowerCase() &&
+      (!editingAsset || a.id !== editingAsset.id)
+    );
+
+    if (isDuplicate) {
+      setError(`Asset tag "${baseTag}" is already in use by another asset.`);
+      return;
+    }
 
     // Determine Final Category
     let finalCategory = selectedCategory;
@@ -154,8 +172,6 @@ const Assets = () => {
       finalCategory = formData.get('customCategory') as string;
       if (!finalCategory.trim()) finalCategory = 'Uncategorized';
     }
-
-    const baseTag = formData.get('tag') as string;
 
     const baseAssetData: any = {
       name: formData.get('name') as string,
@@ -182,6 +198,17 @@ const Assets = () => {
     } else {
       // Create new asset(s)
       const qtyToCreate = showQuantity ? (Number(formData.get('quantity')) || 1) : 1;
+
+      // Double check bulk suffixes too
+      if (qtyToCreate > 1) {
+        for (let i = 0; i < qtyToCreate; i++) {
+          const checkTag = `${baseTag}-${i + 1}`;
+          if (assets.some(a => a.tag.toLowerCase() === checkTag.toLowerCase())) {
+            setError(`Bulk creation failed: Tag "${checkTag}" is already in use.`);
+            return;
+          }
+        }
+      }
 
       for (let i = 0; i < qtyToCreate; i++) {
         const suffix = qtyToCreate > 1 ? `-${i + 1}` : '';
@@ -468,6 +495,12 @@ const Assets = () => {
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">&times;</button>
             </div>
+            {error && (
+              <div className="mx-6 mt-4 p-3 bg-red-50 border border-red-100 text-red-700 text-sm rounded-lg flex items-center gap-2">
+                <AlertTriangle size={16} className="shrink-0" />
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSaveSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2 md:col-span-1">

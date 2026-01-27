@@ -24,3 +24,7 @@ dist-electron
 *.njsproj
 *.sln
 *.sw?
+
+# Database
+mysql_data/
+mysql_recovery_backup/
