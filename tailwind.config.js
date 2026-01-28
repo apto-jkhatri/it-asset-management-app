@@ -7,7 +7,15 @@ export default {
     "./pages/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        brand: {
+          primary: '#E73335',
+          dark: '#9A0B0C',
+          text: '#1B3139',
+        }
+      }
+    },
   },
   plugins: [],
 }

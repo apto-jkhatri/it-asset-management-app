@@ -65,7 +65,7 @@ const Employees = () => {
         </div>
         <button
           onClick={openAddModal}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm"
+          className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-dark transition-colors flex items-center shadow-sm"
         >
           <Plus size={18} className="mr-2" />
           Add Employee
@@ -79,7 +79,7 @@ const Employees = () => {
             <input
               type="text"
               placeholder="Search employees..."
-              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -114,7 +114,7 @@ const Employees = () => {
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => setViewingEmployee(emp)}
-                        className="text-slate-400 hover:text-blue-600 transition-colors p-2 hover:bg-blue-50 rounded-full"
+                        className="text-slate-400 hover:text-brand-primary transition-colors p-2 hover:bg-blue-50 rounded-full"
                         title="View Details"
                       >
                         <Eye size={18} />
@@ -160,11 +160,11 @@ const Employees = () => {
             <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
-                <input required name="name" type="text" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input required name="name" type="text" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none" />
               </div>
               <div className="flex justify-end gap-3 pt-4">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">Add Employee</button>
+                <button type="submit" className="px-4 py-2 text-white bg-brand-primary rounded-lg hover:bg-brand-dark">Add Employee</button>
               </div>
             </form>
           </div>

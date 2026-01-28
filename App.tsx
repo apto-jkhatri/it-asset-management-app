@@ -19,8 +19,8 @@ const App = () => {
   if (loading || isAuthLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center">
-        <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-4" />
-        <p className="text-slate-400 font-medium tracking-widest uppercase text-xs">Initializing Secure Environment...</p>
+        <Loader2 className="w-10 h-10 text-brand-primary animate-spin mb-4" />
+        <p className="text-slate-400 font-medium tracking-widest uppercase text-xs">Initializing Environment...</p>
       </div>
     );
   }

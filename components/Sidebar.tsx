@@ -31,12 +31,12 @@ const Sidebar = () => {
   return (
     <div className="w-64 bg-slate-900 text-slate-100 flex flex-col h-screen sticky top-0 border-r border-slate-800">
       <div className="p-6 border-b border-slate-800 flex items-center space-x-3 select-none">
-        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-900/50">
-          <Box size={20} className="text-white" />
+        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center p-1.5 shadow-lg shadow-brand-dark/20">
+          <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
         </div>
         <div>
-          <span className="text-xl font-bold tracking-tight block leading-none">AssetGuard</span>
-          <span className="text-[10px] text-slate-400 tracking-wider uppercase font-semibold">
+          <span className="text-xl font-bold tracking-tight block leading-none text-white">Aptologics</span>
+          <span className="text-[10px] text-slate-400 tracking-wider uppercase font-semibold mt-1 block">
             {currentUser?.role === 'admin' ? 'Admin Panel' : 'User Portal'}
           </span>
         </div>
@@ -49,7 +49,7 @@ const Sidebar = () => {
             to={item.to}
             className={({ isActive }) =>
               `flex items-center px-4 py-3 rounded-lg transition-all duration-200 select-none ${isActive
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
+                ? 'bg-brand-primary text-white shadow-lg shadow-brand-dark/20'
                 : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
               }`
             }
@@ -64,8 +64,8 @@ const Sidebar = () => {
         <div className="px-4 py-3 bg-slate-800 rounded-lg border border-slate-700 select-none">
           <div className="flex items-center space-x-3">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${currentUser?.role === 'admin'
-                ? 'bg-purple-600 border border-purple-500'
-                : 'bg-blue-600 border border-blue-500'
+              ? 'bg-purple-600 border border-purple-500'
+              : 'bg-brand-primary border border-brand-dark'
               }`}>
               {currentUser?.role === 'admin' ? (
                 <Shield size={16} className="text-white" />

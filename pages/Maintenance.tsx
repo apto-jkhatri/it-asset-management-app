@@ -35,7 +35,7 @@ const Maintenance = () => {
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm"
+          className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-dark transition-colors flex items-center shadow-sm"
         >
           <Plus size={18} className="mr-2" />
           Log Maintenance
@@ -86,7 +86,7 @@ const Maintenance = () => {
                       {log.status === 'In Progress' && (
                         <button 
                           onClick={() => updateMaintenanceLog(log.id, 'Completed')}
-                          className="text-xs text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                          className="text-xs text-brand-primary hover:text-blue-800 font-medium hover:underline"
                         >
                           Mark Complete
                         </button>
@@ -118,7 +118,7 @@ const Maintenance = () => {
             <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Select Asset</label>
-                <select required name="assetId" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <select required name="assetId" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none">
                   <option value="">-- Choose Asset --</option>
                   {assets.map(asset => (
                     <option key={asset.id} value={asset.id}>{asset.name} ({asset.tag}) - {asset.status}</option>
@@ -127,26 +127,26 @@ const Maintenance = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Issue Description</label>
-                <textarea required name="description" rows={3} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Describe the issue..."></textarea>
+                <textarea required name="description" rows={3} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none" placeholder="Describe the issue..."></textarea>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Vendor</label>
-                  <input required name="vendor" type="text" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Repair Shop Name" />
+                  <input required name="vendor" type="text" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none" placeholder="Repair Shop Name" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Cost ($)</label>
-                  <input required name="cost" type="number" min="0" step="0.01" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                  <input required name="cost" type="number" min="0" step="0.01" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Date</label>
-                <input required name="date" type="date" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input required name="date" type="date" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none" />
               </div>
               
               <div className="flex justify-end gap-3 pt-4">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">Save Log</button>
+                <button type="submit" className="px-4 py-2 text-white bg-brand-primary rounded-lg hover:bg-brand-dark">Save Log</button>
               </div>
             </form>
           </div>

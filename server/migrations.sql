@@ -103,10 +103,10 @@ CREATE TABLE IF NOT EXISTS request_metadata (
 
 -- Ensure default admin exists in employees table first to satisfy foreign keys
 INSERT INTO employees (id, name, email, department, role, joinDate) 
-VALUES ('EMP-ADMIN-001', 'System Administrator', 'admin@youroffice.com', 'IT', 'Administrator', '2024-01-01')
+VALUES ('EMP-ADMIN-001', 'System Administrator', 'admin@aptologics.com', 'IT', 'Administrator', '2024-01-01')
 ON DUPLICATE KEY UPDATE id=id;
 
 -- Seed data: Default admin user
 INSERT INTO users (id, name, email, password, role, employeeId) VALUES 
-  ('USR-ADMIN-001', 'System Administrator', 'admin@youroffice.com', 'admin123', 'admin', 'EMP-ADMIN-001')
+  ('USR-ADMIN-001', 'System Administrator', 'admin@aptologics.com', 'admin123', 'admin', 'EMP-ADMIN-001')
 ON DUPLICATE KEY UPDATE id=id;

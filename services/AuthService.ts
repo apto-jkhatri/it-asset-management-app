@@ -9,7 +9,7 @@ export interface AuthProfile {
 class AuthService {
   private currentUser: AuthProfile | null = null;
   private accessToken: string | null = null;
-  private storageKey = 'assetguard_auth';
+  private storageKey = 'aptologics_auth';
 
   constructor() {
     this.restoreFromStorage();

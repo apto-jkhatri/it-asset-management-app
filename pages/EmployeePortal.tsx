@@ -40,7 +40,7 @@ const EmployeePortal = () => {
     <div className="space-y-8 max-w-6xl mx-auto">
       {/* Header */}
       <div className="bg-slate-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600 rounded-full blur-3xl opacity-20 -mr-16 -mt-16"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary rounded-full blur-3xl opacity-20 -mr-16 -mt-16"></div>
         <div className="relative z-10">
           <h1 className="text-3xl font-bold mb-2">Hello, {currentUser?.name}</h1>
           <p className="text-slate-300">Welcome to your employee portal. Manage your assets and requests here.</p>
@@ -51,7 +51,7 @@ const EmployeePortal = () => {
         {/* My Assets Column */}
         <div className="lg:col-span-2 space-y-6">
           <h2 className="text-xl font-bold text-slate-900 flex items-center">
-            <Laptop className="mr-2 text-blue-600" /> My Assigned Assets
+            <Laptop className="mr-2 text-brand-primary" /> My Assigned Assets
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -101,7 +101,7 @@ const EmployeePortal = () => {
             </h2>
             <button
               onClick={() => setRequestModalOpen(true)}
-              className="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm"
+              className="text-sm bg-brand-primary text-white px-3 py-1.5 rounded-lg hover:bg-brand-dark transition-colors flex items-center shadow-sm"
             >
               <Plus size={14} className="mr-1" /> New
             </button>
@@ -140,7 +140,7 @@ const EmployeePortal = () => {
             <form onSubmit={handleRequestSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Asset Category</label>
-                <select name="category" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <select name="category" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none">
                   <option>Laptop</option>
                   <option>Monitor</option>
                   <option>Keyboard</option>
@@ -150,11 +150,11 @@ const EmployeePortal = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Reason for Request</label>
-                <textarea required name="reason" rows={3} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. My current monitor is flickering..."></textarea>
+                <textarea required name="reason" rows={3} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none" placeholder="e.g. My current monitor is flickering..."></textarea>
               </div>
               <div className="flex justify-end gap-3 pt-4">
                 <button type="button" onClick={() => setRequestModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">Submit Request</button>
+                <button type="submit" className="px-4 py-2 text-white bg-brand-primary rounded-lg hover:bg-brand-dark">Submit Request</button>
               </div>
             </form>
           </div>

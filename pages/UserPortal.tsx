@@ -125,7 +125,7 @@ const UserPortal = () => {
                 </div>
                 <button
                     onClick={() => setIsRequestModalOpen(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm"
+                    className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-dark transition-colors flex items-center shadow-sm"
                 >
                     <Package size={18} className="mr-2" />
                     Request New Asset
@@ -135,14 +135,14 @@ const UserPortal = () => {
             {/* User Profile Card */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                 <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-brand-primary to-brand-dark rounded-full flex items-center justify-center">
                         <User size={32} className="text-white" />
                     </div>
                     <div className="flex-1">
-                        <h2 className="text-xl font-bold text-slate-900">{currentUser?.name}</h2>
+                        <h2 className="text-xl font-bold text-slate-900 font-brand">{currentUser?.name}</h2>
                         <p className="text-slate-500">{currentUser?.email}</p>
                         <div className="flex items-center gap-2 mt-1">
-                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase rounded">
+                            <span className="px-2 py-0.5 bg-brand-primary/10 text-brand-primary text-[10px] font-bold uppercase rounded">
                                 Standard User
                             </span>
                             <span className="text-[10px] text-slate-400 font-mono">
@@ -152,7 +152,7 @@ const UserPortal = () => {
                     </div>
                     <button
                         onClick={() => setIsSettingsOpen(true)}
-                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                        className="p-2 text-slate-400 hover:text-brand-primary hover:bg-brand-primary/5 rounded-lg transition-all"
                         title="Account Settings"
                     >
                         <Settings size={20} />
@@ -197,7 +197,7 @@ const UserPortal = () => {
                                     <td className="px-6 py-4 text-right">
                                         <button
                                             onClick={() => setViewingRequest(request)}
-                                            className="text-blue-600 hover:text-blue-800 font-medium flex items-center justify-end ml-auto gap-1"
+                                            className="text-brand-primary hover:text-brand-dark font-medium flex items-center justify-end ml-auto gap-1"
                                         >
                                             <MessageSquare size={14} /> Open Chat
                                         </button>
@@ -249,7 +249,7 @@ const UserPortal = () => {
                                 {messages.map((msg) => (
                                     <div key={msg.id} className={`flex flex-col ${msg.senderId === currentUser?.id ? 'items-end' : 'items-start'}`}>
                                         <div className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${msg.senderId === currentUser?.id
-                                            ? 'bg-blue-600 text-white rounded-tr-none'
+                                            ? 'bg-brand-primary text-white rounded-tr-none'
                                             : 'bg-white text-slate-700 border border-slate-200 rounded-tl-none'
                                             }`}>
                                             <p className="text-sm">{msg.message}</p>
@@ -277,12 +277,12 @@ const UserPortal = () => {
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
                                     placeholder="Type your message..."
-                                    className="flex-1 px-4 py-2 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="flex-1 px-4 py-2 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-brand-primary outline-none"
                                 />
                                 <button
                                     type="submit"
                                     disabled={!newMessage.trim() || isSending}
-                                    className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                    className="w-10 h-10 bg-brand-primary text-white rounded-full flex items-center justify-center hover:bg-brand-dark disabled:opacity-50 transition-colors"
                                 >
                                     <Send size={18} />
                                 </button>
@@ -311,7 +311,7 @@ const UserPortal = () => {
                                     required
                                     value={requestCategory}
                                     onChange={(e) => setRequestCategory(e.target.value)}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                                 >
                                     <option value="">Select category...</option>
                                     <option value="Laptop">Laptop</option>
@@ -328,13 +328,13 @@ const UserPortal = () => {
                                     value={requestReason}
                                     onChange={(e) => setRequestReason(e.target.value)}
                                     rows={4}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                                     placeholder="Please explain why you need this asset..."
                                 />
                             </div>
                             <div className="flex justify-end gap-3 pt-4">
                                 <button type="button" onClick={() => setIsRequestModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
-                                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">Submit Request</button>
+                                <button type="submit" className="px-4 py-2 text-white bg-brand-primary rounded-lg hover:bg-brand-dark">Submit Request</button>
                             </div>
                         </form>
                     </div>
@@ -361,7 +361,7 @@ const UserPortal = () => {
                                                 type="password"
                                                 value={newPass}
                                                 onChange={(e) => setNewPass(e.target.value)}
-                                                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                                                 placeholder="••••••••"
                                             />
                                         </div>
@@ -375,7 +375,7 @@ const UserPortal = () => {
                                                 type="password"
                                                 value={confirmPass}
                                                 onChange={(e) => setConfirmPass(e.target.value)}
-                                                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                                                 placeholder="••••••••"
                                             />
                                         </div>
@@ -388,7 +388,7 @@ const UserPortal = () => {
                                     <button
                                         type="submit"
                                         disabled={resetStatus === 'loading' || resetStatus === 'success'}
-                                        className={`w-full py-2 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 ${resetStatus === 'success' ? 'bg-green-500 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'
+                                        className={`w-full py-2 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 ${resetStatus === 'success' ? 'bg-green-500 text-white' : 'bg-brand-primary text-white hover:bg-brand-dark'
                                             }`}
                                     >
                                         {resetStatus === 'loading' ? 'Updating...' :

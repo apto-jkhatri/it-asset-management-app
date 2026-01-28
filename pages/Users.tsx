@@ -31,7 +31,7 @@ const Users = () => {
 
     const loadUsers = async () => {
         try {
-            const token = localStorage.getItem('assetguard_auth');
+            const token = localStorage.getItem('aptologics_auth');
             if (!token) return;
             const { token: sessionToken } = JSON.parse(token);
 
@@ -52,7 +52,7 @@ const Users = () => {
         setError('');
 
         try {
-            const token = localStorage.getItem('assetguard_auth');
+            const token = localStorage.getItem('aptologics_auth');
             if (!token) return;
             const { token: sessionToken } = JSON.parse(token);
 
@@ -88,7 +88,7 @@ const Users = () => {
 
         setResetStatus('loading');
         try {
-            const token = localStorage.getItem('assetguard_auth');
+            const token = localStorage.getItem('aptologics_auth');
             if (!token) return;
             const { token: sessionToken } = JSON.parse(token);
 
@@ -122,7 +122,7 @@ const Users = () => {
         if (!confirm('Are you sure you want to delete this user?')) return;
 
         try {
-            const token = localStorage.getItem('assetguard_auth');
+            const token = localStorage.getItem('aptologics_auth');
             if (!token) return;
             const { token: sessionToken } = JSON.parse(token);
 
@@ -148,7 +148,7 @@ const Users = () => {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm"
+                    className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-dark transition-colors flex items-center shadow-sm"
                 >
                     <Plus size={18} className="mr-2" />
                     Add New User
@@ -177,7 +177,7 @@ const Users = () => {
                                                 {user.role === 'admin' ? (
                                                     <Shield size={20} className="text-purple-600" />
                                                 ) : (
-                                                    <User size={20} className="text-blue-600" />
+                                                    <User size={20} className="text-brand-primary" />
                                                 )}
                                             </div>
                                             <div>
@@ -248,7 +248,7 @@ const Users = () => {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     type="text"
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                                     placeholder="John Doe"
                                 />
                             </div>
@@ -259,7 +259,7 @@ const Users = () => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     type="email"
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                                     placeholder="john@youroffice.com"
                                 />
                             </div>
@@ -270,7 +270,7 @@ const Users = () => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     type="password"
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                                     placeholder="••••••••"
                                 />
                             </div>
@@ -281,7 +281,7 @@ const Users = () => {
                                     value={department}
                                     onChange={(e) => setDepartment(e.target.value)}
                                     type="text"
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                                     placeholder="e.g. IT, HR, Sales"
                                 />
                             </div>
@@ -290,7 +290,7 @@ const Users = () => {
                                 <select
                                     value={role}
                                     onChange={(e) => setRole(e.target.value as 'admin' | 'user')}
-                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                                 >
                                     <option value="user">Standard User</option>
                                     <option value="admin">Administrator</option>
@@ -298,7 +298,7 @@ const Users = () => {
                             </div>
                             <div className="flex justify-end gap-3 pt-4">
                                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
-                                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">Create User</button>
+                                <button type="submit" className="px-4 py-2 text-white bg-brand-primary rounded-lg hover:bg-brand-dark">Create User</button>
                             </div>
                         </form>
                     </div>
@@ -326,7 +326,7 @@ const Users = () => {
                                             type="password"
                                             value={newPassword}
                                             onChange={(e) => setNewPassword(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                                             placeholder="••••••••"
                                         />
                                     </div>
@@ -342,7 +342,7 @@ const Users = () => {
                                     <button
                                         type="submit"
                                         disabled={resetStatus === 'loading' || resetStatus === 'success'}
-                                        className={`px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 ${resetStatus === 'success' ? 'bg-green-500 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'
+                                        className={`px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 ${resetStatus === 'success' ? 'bg-green-500 text-white' : 'bg-brand-primary text-white hover:bg-brand-dark'
                                             }`}
                                     >
                                         {resetStatus === 'loading' ? 'Updating...' :

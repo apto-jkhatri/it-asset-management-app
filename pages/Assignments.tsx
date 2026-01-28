@@ -58,7 +58,7 @@ const Assignments = () => {
         </div>
         <button 
           onClick={() => setAssignModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm"
+          className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-dark transition-colors flex items-center shadow-sm"
         >
           <Plus size={18} className="mr-2" />
           New Assignment
@@ -119,7 +119,7 @@ const Assignments = () => {
 
         {/* Quick Stats or Instructions */}
         <div className="space-y-6">
-            <div className="bg-blue-600 rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
+            <div className="bg-brand-primary rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
                 <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                 <h3 className="text-lg font-bold mb-2">Assignment Policy</h3>
                 <ul className="text-sm space-y-2 text-blue-100 list-disc list-inside">
@@ -177,7 +177,7 @@ const Assignments = () => {
                 <label className="block text-sm font-medium text-slate-700 mb-1">Select Employee</label>
                 <select 
                   required 
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                   value={selectedEmployee}
                   onChange={(e) => setSelectedEmployee(e.target.value)}
                 >
@@ -191,13 +191,13 @@ const Assignments = () => {
                   <input
                     type="text"
                     placeholder="Search by tag or name..."
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                     value={assetSearchTerm}
                     onChange={(e) => setAssetSearchTerm(e.target.value)}
                   />
                   <select 
                     required 
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                     value={selectedAsset}
                     onChange={(e) => setSelectedAsset(e.target.value)}
                   >
@@ -208,7 +208,7 @@ const Assignments = () => {
               </div>
               <div className="flex justify-end gap-3 pt-4">
                 <button type="button" onClick={() => setAssignModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">Confirm Assignment</button>
+                <button type="submit" className="px-4 py-2 text-white bg-brand-primary rounded-lg hover:bg-brand-dark">Confirm Assignment</button>
               </div>
             </form>
           </div>
@@ -235,7 +235,7 @@ const Assignments = () => {
                 <label className="block text-sm font-medium text-slate-700 mb-1">Return Reason / Notes</label>
                 <textarea 
                   required
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                   rows={3}
                   placeholder="e.g. Employee left company, Upgrade, Damaged..."
                   value={returnNotes}
@@ -245,7 +245,7 @@ const Assignments = () => {
 
               <div className="flex justify-end gap-3 pt-4">
                 <button type="button" onClick={() => setReturnModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">Confirm Return</button>
+                <button type="submit" className="px-4 py-2 text-white bg-brand-primary rounded-lg hover:bg-brand-dark">Confirm Return</button>
               </div>
             </form>
           </div>

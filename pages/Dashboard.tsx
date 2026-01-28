@@ -134,7 +134,7 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Inventory Dashboard</h1>
+          <h1 className="text-2xl font-bold text-slate-900">Aptologics Inventory</h1>
           <p className="text-slate-500">Real-time overview of your asset availability and health.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -146,7 +146,7 @@ const Dashboard = () => {
           </button>
           <button
             onClick={handleExportEmployeeAssignments}
-            className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95 text-sm font-medium"
+            className="flex items-center gap-2 bg-brand-dark text-white px-5 py-2.5 rounded-xl hover:bg-brand-primary transition-all shadow-lg active:scale-95 text-sm font-medium"
           >
             Export Employee Assignments
           </button>
@@ -157,7 +157,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard title="Ready for Issue" value={availableAssetsCount} icon={Box} color="bg-emerald-500 shadow-emerald-200" />
         <StatCard title="Out for Repair" value={inRepairCount} icon={Wrench} color="bg-amber-500 shadow-amber-200" />
-        <StatCard title="Currently Assigned" value={assignedAssetsCount} icon={Users} color="bg-blue-500 shadow-blue-200" />
+        <StatCard title="Currently Assigned" value={assignedAssetsCount} icon={Users} color="bg-brand-primary shadow-brand-primary/20" />
       </div>
 
       <div className="grid grid-cols-1 gap-6">
@@ -204,7 +204,7 @@ const Dashboard = () => {
                 />
                 <Bar
                   dataKey="Assigned"
-                  fill="#3b82f6"
+                  fill="#E73335"
                   radius={[0, 0, 0, 0]}
                   stackId="a"
                   onClick={(data) => handleBarClick(data, AssetStatus.ASSIGNED)}
@@ -234,7 +234,7 @@ const Dashboard = () => {
                 <h3 className="text-lg font-bold text-slate-900">
                   {selectedFilter.status} {selectedFilter.category}s
                 </h3>
-                <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">
+                <span className="bg-brand-primary/10 text-brand-primary text-xs font-bold px-2 py-1 rounded-full">
                   {filteredAssetsList.length} Found
                 </span>
               </div>
@@ -288,7 +288,7 @@ const Dashboard = () => {
                       <td className="px-6 py-4 text-right">
                         <button
                           onClick={() => navigate('/assets')}
-                          className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1 group"
+                          className="text-brand-primary hover:text-brand-dark font-medium inline-flex items-center gap-1 group"
                         >
                           Details <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </button>

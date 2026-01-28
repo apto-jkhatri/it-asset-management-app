@@ -122,7 +122,7 @@ const Requests = () => {
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm"
+          className="bg-brand-primary text-white px-4 py-2 rounded-lg hover:bg-brand-dark transition-colors flex items-center shadow-sm"
         >
           <Plus size={18} className="mr-2" />
           Create Request
@@ -248,7 +248,7 @@ const Requests = () => {
             <form onSubmit={handleCreateSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Request From (Employee)</label>
-                <select required name="employeeId" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <select required name="employeeId" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none">
                   <option value="">-- Select Employee --</option>
                   {employees.map(e => <option key={e.id} value={e.id}>{e.name} ({e.department})</option>)}
                 </select>
@@ -256,7 +256,7 @@ const Requests = () => {
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Asset / Service Category</label>
                 <div className="relative">
-                  <input list="categories" required name="category" type="text" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. Laptop Repair, New Keyboard..." />
+                  <input list="categories" required name="category" type="text" className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none" placeholder="e.g. Laptop Repair, New Keyboard..." />
                   <datalist id="categories">
                     <option value="Hardware Issue" />
                     <option value="Software License" />
@@ -267,11 +267,11 @@ const Requests = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Details / Comments</label>
-                <textarea required name="reason" rows={4} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Describe the request..."></textarea>
+                <textarea required name="reason" rows={4} className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none" placeholder="Describe the request..."></textarea>
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
                 <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
-                <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">Submit Request</button>
+                <button type="submit" className="px-4 py-2 text-white bg-brand-primary rounded-lg hover:bg-brand-dark">Submit Request</button>
               </div>
             </form>
           </div>
@@ -286,7 +286,7 @@ const Requests = () => {
             {/* Header */}
             <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center px-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white rounded-lg border border-slate-200 flex items-center justify-center text-blue-600 shadow-sm">
+                <div className="w-10 h-10 bg-white rounded-lg border border-slate-200 flex items-center justify-center text-brand-primary shadow-sm">
                   <FileText size={20} />
                 </div>
                 <div>
@@ -294,9 +294,9 @@ const Requests = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono text-slate-500">{viewingRequest.id}</span>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase font-bold tracking-wider ${viewingRequest.status === 'Approved' ? 'bg-green-100 text-green-700' :
-                        viewingRequest.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                          viewingRequest.status === 'Closed' ? 'bg-slate-100 text-slate-700' :
-                            'bg-yellow-100 text-yellow-700'
+                      viewingRequest.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                        viewingRequest.status === 'Closed' ? 'bg-slate-100 text-slate-700' :
+                          'bg-yellow-100 text-yellow-700'
                       }`}>
                       {viewingRequest.status}
                     </span>
@@ -328,7 +328,7 @@ const Requests = () => {
                   {viewingRequest.requestIp && (
                     <div className="mt-2 text-[10px] text-slate-400 font-medium px-1 flex justify-between">
                       <span>Source IP:</span>
-                      <span className="font-mono">{viewingRequest.requestIp}</span>
+                      <span className="font-mono text-brand-primary">{viewingRequest.requestIp}</span>
                     </div>
                   )}
                 </div>
@@ -374,7 +374,7 @@ const Requests = () => {
               {/* Right Panel: Chat Interaction */}
               <div className="flex-1 flex flex-col bg-white">
                 <div className="p-4 border-b border-slate-100 flex items-center gap-2 px-6">
-                  <MessageSquare size={16} className="text-blue-500" />
+                  <MessageSquare size={16} className="text-brand-primary" />
                   <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Ticket Conversation</h4>
                 </div>
 
@@ -382,8 +382,8 @@ const Requests = () => {
                   {messages.map((msg) => (
                     <div key={msg.id} className={`flex flex-col ${msg.senderId === currentUser?.id ? 'items-end' : 'items-start'}`}>
                       <div className={`max-w-[75%] p-3 rounded-2xl shadow-sm ${msg.senderId === currentUser?.id
-                          ? 'bg-blue-600 text-white rounded-tr-none'
-                          : 'bg-white text-slate-700 border border-slate-200 rounded-tl-none'
+                        ? 'bg-brand-primary text-white rounded-tr-none'
+                        : 'bg-white text-slate-700 border border-slate-200 rounded-tl-none'
                         }`}>
                         <p className="text-sm leading-relaxed">{msg.message}</p>
                       </div>
@@ -414,12 +414,12 @@ const Requests = () => {
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type a response or attach information..."
-                      className="flex-1 px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                      className="flex-1 px-4 py-3 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand-primary outline-none transition-all"
                     />
                     <button
                       type="submit"
                       disabled={!newMessage.trim() || isSending}
-                      className="px-6 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 disabled:opacity-50 transition-all shadow-md shadow-blue-200 active:scale-95"
+                      className="px-6 bg-brand-primary text-white rounded-xl flex items-center justify-center hover:bg-brand-dark disabled:opacity-50 transition-all shadow-md shadow-brand-primary/20 active:scale-95"
                     >
                       <Send size={18} className="mr-2" />
                       <span className="font-bold text-sm">Send</span>
