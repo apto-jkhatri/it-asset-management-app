@@ -8,6 +8,8 @@ import Assignments from './pages/Assignments';
 import Employees from './pages/Employees';
 import Maintenance from './pages/Maintenance';
 import Requests from './pages/Requests';
+import Users from './pages/Users';
+import UserPortal from './pages/UserPortal';
 import Login from './pages/Login';
 import { Loader2 } from 'lucide-react';
 
@@ -28,6 +30,25 @@ const App = () => {
     return <Login />;
   }
 
+  // Role-based routing
+  if (currentUser.role === 'user') {
+    // Standard user sees only their portal
+    return (
+      <HashRouter>
+        <div className="flex min-h-screen bg-slate-50">
+          <Sidebar />
+          <main className="flex-1 p-8 overflow-y-auto h-screen bg-slate-50">
+            <Routes>
+              <Route path="/" element={<UserPortal />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+        </div>
+      </HashRouter>
+    );
+  }
+
+  // Admin sees full application
   return (
     <HashRouter>
       <div className="flex min-h-screen bg-slate-50">
@@ -40,6 +61,7 @@ const App = () => {
             <Route path="/employees" element={<Employees />} />
             <Route path="/maintenance" element={<Maintenance />} />
             <Route path="/requests" element={<Requests />} />
+            <Route path="/users" element={<Users />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

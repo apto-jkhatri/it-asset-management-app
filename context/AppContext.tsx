@@ -13,7 +13,7 @@ interface AppContextType {
   isAuthLoading: boolean;
   currentUser: AuthProfile | null;
   accessToken: string | null;
-  login: () => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   addAsset: (asset: Asset) => void;
   addEmployee: (employee: Employee) => void;
@@ -64,32 +64,64 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, []);
 
   useEffect(() => {
-    if (!currentUser) return;
     const loadData = async () => {
+      if (!currentUser) {
+        setEmployees([]);
+        setAssets([]);
+        setAssignments([]);
+        setMaintenanceLogs([]);
+        setRequests([]);
+        return;
+      }
+
+      console.log(`[AppContext] Loading data for ${currentUser.role}...`);
+
+      // All users can see assets and requests
       try {
-        const [employeesData, assetsData, assignmentsData, maintenanceData, requestsData] = await Promise.all([
-          Api.getEmployees(),
-          Api.getAssets(),
-          Api.getAssignments(),
-          Api.getMaintenance(),
-          Api.getRequests(),
-        ]);
-        setEmployees(employeesData || []);
+        const assetsData = await Api.getAssets();
         setAssets(assetsData || []);
-        setAssignments(assignmentsData || []);
-        setMaintenanceLogs(maintenanceData || []);
+      } catch (e) {
+        console.error("Failed to load assets", e);
+      }
+
+      try {
+        const requestsData = await Api.getRequests();
         setRequests(requestsData || []);
-      } catch (error) {
-        console.error("Failed to load data from API", error);
+      } catch (e) {
+        console.error("Failed to load requests", e);
+      }
+
+      // Only admins fetch management data
+      if (currentUser.role === 'admin') {
+        try {
+          const employeesData = await Api.getEmployees();
+          setEmployees(employeesData || []);
+        } catch (e) {
+          console.error("Failed to load employees", e);
+        }
+
+        try {
+          const assignmentsData = await Api.getAssignments();
+          setAssignments(assignmentsData || []);
+        } catch (e) {
+          console.error("Failed to load assignments", e);
+        }
+
+        try {
+          const maintenanceData = await Api.getMaintenance();
+          setMaintenanceLogs(maintenanceData || []);
+        } catch (e) {
+          console.error("Failed to load maintenance", e);
+        }
       }
     };
     loadData();
   }, [currentUser]);
 
-  const login = async (): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     setIsAuthLoading(true);
     try {
-      const response = await authService.login();
+      const response = await authService.login(email, password);
       if (response) {
         setCurrentUser(response.user);
         setAccessToken(response.token);
@@ -239,7 +271,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
   const createRequest = (req: AssetRequest) => {
-    setRequests(prev => [req, ...prev]);
+    const enrichedReq = {
+      ...req,
+      userId: currentUser?.id,
+      employeeId: currentUser?.employeeId || 'EMP-UNKNOWN',
+      userName: currentUser?.name || 'You',
+      userEmail: currentUser?.email || ''
+    };
+    setRequests(prev => [enrichedReq, ...prev]);
     Api.saveRequest(req).catch(err => {
       console.error('Failed to create request', err);
       setRequests(prev => prev.filter(r => r.id !== req.id));

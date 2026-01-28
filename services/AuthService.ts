@@ -1,10 +1,9 @@
-import { AZURE_CONFIG } from '../config';
-
 export interface AuthProfile {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
+  role: 'admin' | 'user';
+  employeeId?: string;
 }
 
 class AuthService {
@@ -21,11 +20,20 @@ class AuthService {
       const stored = localStorage.getItem(this.storageKey);
       if (stored) {
         const { user, token } = JSON.parse(stored);
-        this.currentUser = user;
-        this.accessToken = token;
+        // Validate that the stored user has the new format (with 'role' property)
+        // Old mock sessions won't have this, so we clear them
+        if (user && user.role && (user.role === 'admin' || user.role === 'user')) {
+          this.currentUser = user;
+          this.accessToken = token;
+        } else {
+          // Clear invalid/old session data
+          console.log('[Auth] Clearing old session format');
+          localStorage.removeItem(this.storageKey);
+        }
       }
     } catch (e) {
       console.warn('Failed to restore auth from storage', e);
+      localStorage.removeItem(this.storageKey);
     }
   }
 
@@ -42,40 +50,43 @@ class AuthService {
     }
   }
 
-  // In a real production environment with MSAL:
-  // this.msalInstance = new PublicClientApplication(msalConfig);
-
-  async login(): Promise<{ user: AuthProfile; token: string } | null> {
+  async login(email: string, password: string): Promise<{ user: AuthProfile; token: string } | null> {
     try {
-      // SIMULATION: In a real Azure setup, you would use:
-      // const response = await this.msalInstance.loginPopup(loginRequest);
-      // this.accessToken = response.accessToken;
-      // return { user: { ... }, token: response.accessToken };
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
 
-      console.log("Triggering Azure Login Flow...");
-      
-      // Artificial delay to simulate the popup interaction
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Login failed');
+      }
 
-      const mockUser: AuthProfile = {
-        id: 'AZ-998877',
-        name: 'Azure User',
-        email: 'user@yourcompany.com',
-        avatar: `https://ui-avatars.com/api/?name=Azure+User&background=0078d4&color=fff`
-      };
-
-      this.currentUser = mockUser;
-      this.accessToken = "mock_azure_jwt_token";
+      const data = await response.json();
+      this.currentUser = data.user;
+      this.accessToken = data.token;
       this.saveToStorage();
 
-      return { user: mockUser, token: this.accessToken };
+      return { user: data.user, token: data.token };
     } catch (error) {
-      console.error("Azure Authentication Failed:", error);
+      console.error("Authentication Failed:", error);
       throw error;
     }
   }
 
   async logout(): Promise<void> {
+    try {
+      if (this.accessToken) {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { 'X-Session-Token': this.accessToken }
+        });
+      }
+    } catch (e) {
+      console.warn('Logout request failed', e);
+    }
+
     this.currentUser = null;
     this.accessToken = null;
     try {
@@ -83,7 +94,6 @@ class AuthService {
     } catch (e) {
       console.warn('Failed to clear auth storage', e);
     }
-    // this.msalInstance.logoutPopup();
   }
 
   async getToken(): Promise<string | null> {

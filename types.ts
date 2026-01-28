@@ -69,4 +69,7 @@ export interface AssetRequest {
   reason: string;
   status: 'Pending' | 'Approved' | 'Rejected' | 'Closed';
   requestDate: string;
+  userName?: string;
+  userEmail?: string;
+  requestIp?: string;
 }
