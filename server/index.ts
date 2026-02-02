@@ -16,7 +16,9 @@ app.use(express.json());
 
 // Request logger for debugging
 app.use((req: any, res: any, next: any) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  res.on('finish', () => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url} - ${res.statusCode}`);
+  });
   next();
 });
 
@@ -92,21 +94,27 @@ app.get('/api/users', requireAuth, requireAdmin, async (req: any, res: any) => {
 });
 
 app.post('/api/users', requireAuth, requireAdmin, async (req: any, res: any) => {
-  const { name, email, password, role, department } = req.body;
+  const { name, email, password, role, department, shouldCreateEmployee = false } = req.body;
   const userId = `USR-${Date.now()}`;
-  const employeeId = `EMP-${Date.now()}`;
 
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
 
-    // 1. Create Employee record first to satisfy foreign key constraints in existing tables
-    await connection.query(
-      'INSERT INTO employees (id, name, email, department, role, joinDate) VALUES (?, ?, ?, ?, ?, ?)',
-      [employeeId, name, email, department || 'Staff', role === 'admin' ? 'Administrator' : 'Employee', new Date().toISOString().split('T')[0]]
-    );
+    // 1. Check if an employee with this email already exists
+    const [existingEmployees]: any = await connection.query('SELECT id FROM employees WHERE email = ?', [email]);
+    let employeeId = existingEmployees.length > 0 ? existingEmployees[0].id : null;
 
-    // 2. Create User record
+    // 2. Create Employee record if not found and requested
+    if (!employeeId && shouldCreateEmployee) {
+      employeeId = `EMP-${Date.now()}`;
+      await connection.query(
+        'INSERT INTO employees (id, name, email, department, role, joinDate) VALUES (?, ?, ?, ?, ?, ?)',
+        [employeeId, name, email, department || 'Staff', role === 'admin' ? 'Administrator' : 'Employee', new Date().toISOString().split('T')[0]]
+      );
+    }
+
+    // 3. Create User record
     await connection.query(
       'INSERT INTO users (id, name, email, password, role, employeeId) VALUES (?, ?, ?, ?, ?, ?)',
       [userId, name, email, password, role || 'user', employeeId]
@@ -213,16 +221,30 @@ app.get('/api/employees', requireAuth, requireAdmin, async (req: any, res: any) 
 // @ts-ignore - express types not included in build environment
 app.post('/api/employees', requireAuth, requireAdmin, async (req: any, res: any) => {
   const e = req.body;
+  const connection = await pool.getConnection();
   try {
-    await pool.query(`
+    await connection.beginTransaction();
+
+    // 1. Update/Insert Employee
+    await connection.query(`
       INSERT INTO employees (id, name, email, department, role, joinDate, avatar)
       VALUES (?, ?, ?, ?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE name = VALUES(name), email = VALUES(email), department = VALUES(department), role = VALUES(role), joinDate = VALUES(joinDate), avatar = VALUES(avatar)
     `, [e.id, e.name, e.email, e.department, e.role, e.joinDate, e.avatar || null]);
+
+    // 2. Synchronize email with linked User if any
+    await connection.query(`
+      UPDATE users SET email = ? WHERE employeeId = ?
+    `, [e.email, e.id]);
+
+    await connection.commit();
     res.sendStatus(200);
   } catch (err) {
+    await connection.rollback();
     console.error(err);
     res.status(500).json({ error: 'db error' });
+  } finally {
+    connection.release();
   }
 });
 
@@ -299,7 +321,8 @@ app.post('/api/maintenance', requireAuth, requireAdmin, async (req: any, res: an
 app.get('/api/requests', requireAuth, async (req: any, res: any) => {
   try {
     let query = `
-      SELECT r.*, m.userId, m.userName, m.userEmail, m.requestIp 
+      SELECT r.*, m.userId, m.userName, m.userEmail, m.requestIp,
+             (SELECT COUNT(*) FROM ticket_messages WHERE requestId = r.id) as messageCount
       FROM asset_requests r
       LEFT JOIN request_metadata m ON r.id = m.requestId
     `;

@@ -17,6 +17,7 @@ interface AppContextType {
   logout: () => void;
   addAsset: (asset: Asset) => void;
   addEmployee: (employee: Employee) => void;
+  updateEmployee: (employee: Employee) => void;
   deleteEmployee: (id: string) => void;
   updateAsset: (asset: Asset) => void;
   deleteAsset: (id: string) => void;
@@ -41,81 +42,122 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [requests, setRequests] = useState<AssetRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [currentUser, setCurrentUser] = useState<AuthProfile | null>(null);
+  // Refs for background notification logic (avoids closure capture issues and extra renders)
+  const knownStatesRef = React.useRef<Map<string, number>>(new Map());
+  const initialLoadDoneRef = React.useRef(false);
+
+  const [currentUser, setCurrentUser] = useState<AuthProfile | null>(authService.getCurrentUser());
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
 
+  // Notification setup
   useEffect(() => {
-    const initializeAuth = async () => {
-      setLoading(true);
+    if (currentUser && 'Notification' in window) {
+      if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        Notification.requestPermission();
+      }
+    }
+  }, [currentUser]);
+
+  const showNotification = (title: string, body: string) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, {
+        body,
+        icon: '/logo.png'
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!currentUser) {
+      setEmployees([]);
+      setAssets([]);
+      setAssignments([]);
+      setMaintenanceLogs([]);
+      setRequests([]);
+      knownStatesRef.current = new Map();
+      initialLoadDoneRef.current = false;
+      setLoading(false);
+      return;
+    }
+
+    const isAdmin = currentUser.role === 'admin';
+
+    // 1. High Priority Refresher (Requests/Messages) - Runs frequently
+    const refreshRequests = async (isInitial = false) => {
       try {
-        const storedUser = authService.getCurrentUser();
-        if (storedUser) {
-          setCurrentUser(storedUser);
-          setAccessToken(await authService.getToken());
+        const requestsData = await Api.getRequests();
+        if (!requestsData) return;
+
+        // Notification Check (only if not initial load and we have established known states)
+        if (!isInitial && initialLoadDoneRef.current) {
+          requestsData.forEach((req: any) => {
+            const prevCount = knownStatesRef.current.get(req.id);
+
+            if (prevCount === undefined) {
+              // New Request
+              if (isAdmin && req.status === 'Pending') {
+                showNotification('New Asset Request', `From: ${req.userName || 'Employee'} - ${req.category}`);
+              }
+            } else if (req.messageCount > prevCount) {
+              // New Message
+              showNotification('New Ticket Reply', `Update on ticket ${req.id}`);
+            }
+          });
         }
-      } catch (error) {
-        console.error("Failed to initialize auth", error);
+
+        // Update tracking ref immediately
+        const nextStates = new Map();
+        requestsData.forEach((r: any) => nextStates.set(r.id, r.messageCount || 0));
+        knownStatesRef.current = nextStates;
+
+        // Update state for UI
+        setRequests(requestsData);
+        if (isInitial) initialLoadDoneRef.current = true;
+      } catch (e) {
+        console.error("[Poll] Failed to refresh requests", e);
+      }
+    };
+
+    // 2. Standard Data Refresher (Heavy objects) - Runs infrequently
+    const refreshManagementData = async () => {
+      try {
+        const assetsData = await Api.getAssets();
+        setAssets(assetsData || []);
+
+        if (isAdmin) {
+          const [emp, asg, maint] = await Promise.all([
+            Api.getEmployees(),
+            Api.getAssignments(),
+            Api.getMaintenance()
+          ]);
+          setEmployees(emp || []);
+          setAssignments(asg || []);
+          setMaintenanceLogs(maint || []);
+        }
+      } catch (e) {
+        console.error("[Poll] Failed to refresh management data", e);
+      }
+    };
+
+    // Initial Load
+    const runInitial = async () => {
+      try {
+        await Promise.all([refreshRequests(true), refreshManagementData()]);
       } finally {
         setLoading(false);
       }
     };
-    initializeAuth();
-  }, []);
+    runInitial();
 
-  useEffect(() => {
-    const loadData = async () => {
-      if (!currentUser) {
-        setEmployees([]);
-        setAssets([]);
-        setAssignments([]);
-        setMaintenanceLogs([]);
-        setRequests([]);
-        return;
-      }
+    // Setup Polling
+    const fastInterval = setInterval(() => refreshRequests(false), 8000); // 8 sec for chat/requests (slightly slower to be safe)
+    const slowInterval = setInterval(() => refreshManagementData(), 60000); // 1 min for inventory
 
-      console.log(`[AppContext] Loading data for ${currentUser.role}...`);
-
-      // All users can see assets and requests
-      try {
-        const assetsData = await Api.getAssets();
-        setAssets(assetsData || []);
-      } catch (e) {
-        console.error("Failed to load assets", e);
-      }
-
-      try {
-        const requestsData = await Api.getRequests();
-        setRequests(requestsData || []);
-      } catch (e) {
-        console.error("Failed to load requests", e);
-      }
-
-      // Only admins fetch management data
-      if (currentUser.role === 'admin') {
-        try {
-          const employeesData = await Api.getEmployees();
-          setEmployees(employeesData || []);
-        } catch (e) {
-          console.error("Failed to load employees", e);
-        }
-
-        try {
-          const assignmentsData = await Api.getAssignments();
-          setAssignments(assignmentsData || []);
-        } catch (e) {
-          console.error("Failed to load assignments", e);
-        }
-
-        try {
-          const maintenanceData = await Api.getMaintenance();
-          setMaintenanceLogs(maintenanceData || []);
-        } catch (e) {
-          console.error("Failed to load maintenance", e);
-        }
-      }
+    return () => {
+      clearInterval(fastInterval);
+      clearInterval(slowInterval);
     };
-    loadData();
   }, [currentUser]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -154,6 +196,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     Api.saveEmployee(employee).catch(err => {
       console.error('Failed to save employee to API', err);
       setEmployees(prev => prev.filter(e => e.id !== employee.id));
+    });
+  };
+  const updateEmployee = (employee: Employee) => {
+    const original = employees.find(e => e.id === employee.id);
+    setEmployees(prev => prev.map(e => e.id === employee.id ? employee : e));
+    Api.saveEmployee(employee).catch(err => {
+      console.error('Failed to update employee', err);
+      if (original) setEmployees(prev => prev.map(e => e.id === employee.id ? original : e));
     });
   };
   const deleteEmployee = (id: string) => {
@@ -333,7 +383,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       loading, isAuthLoading, currentUser, accessToken,
       login, logout, addAsset, addEmployee, deleteEmployee, updateAsset, deleteAsset,
       assignAsset, returnAsset, addMaintenanceLog, updateMaintenanceLog,
-      approveRequest, rejectRequest, createRequest, updateRequest, closeRequest
+      approveRequest, rejectRequest, createRequest, updateRequest, closeRequest,
+      updateEmployee
     }}>
       {children}
     </AppContext.Provider>

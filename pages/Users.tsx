@@ -17,6 +17,7 @@ const Users = () => {
     const [password, setPassword] = useState('');
     const [department, setDepartment] = useState('');
     const [role, setRole] = useState<'admin' | 'user'>('user');
+    const [shouldCreateEmployee, setShouldCreateEmployee] = useState(false);
     const [error, setError] = useState('');
 
     // Reset Password State
@@ -62,7 +63,7 @@ const Users = () => {
                     'Content-Type': 'application/json',
                     'X-Session-Token': sessionToken
                 },
-                body: JSON.stringify({ name, email, password, role, department })
+                body: JSON.stringify({ name, email, password, role, department, shouldCreateEmployee })
             });
 
             if (!response.ok) {
@@ -77,6 +78,7 @@ const Users = () => {
             setPassword('');
             setDepartment('');
             setRole('user');
+            setShouldCreateEmployee(false);
         } catch (err: any) {
             setError(err.message);
         }
@@ -296,6 +298,21 @@ const Users = () => {
                                     <option value="admin">Administrator</option>
                                 </select>
                             </div>
+                            <div className="flex items-center gap-2 py-2">
+                                <input
+                                    id="shouldCreateEmployee"
+                                    type="checkbox"
+                                    checked={shouldCreateEmployee}
+                                    onChange={(e) => setShouldCreateEmployee(e.target.checked)}
+                                    className="w-4 h-4 text-brand-primary border-slate-300 rounded focus:ring-brand-primary"
+                                />
+                                <label htmlFor="shouldCreateEmployee" className="text-sm text-slate-700">
+                                    Create new employee record if not found
+                                </label>
+                            </div>
+                            <p className="text-[10px] text-slate-400 italic">
+                                * System will automatically link this user to an existing employee if a matching email is found.
+                            </p>
                             <div className="flex justify-end gap-3 pt-4">
                                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50">Cancel</button>
                                 <button type="submit" className="px-4 py-2 text-white bg-brand-primary rounded-lg hover:bg-brand-dark">Create User</button>
